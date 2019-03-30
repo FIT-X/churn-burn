@@ -15,7 +15,7 @@ export default class DeckGLOverlay extends Component {
   }
 
   render() {
-    const {viewport, maleColor, femaleColor, data, radius, heatData, cellSize, towerData, coolData} = this.props;
+    const {viewport, maleColor, femaleColor, data, radius, heatData, cellSize, towerData, coolData, newTowerData} = this.props;
 
     if (!data || !heatData) {
       return null;
@@ -47,6 +47,19 @@ export default class DeckGLOverlay extends Component {
       }
     });
 
+    const newTower = new ScatterplotLayer({
+      id: 'new-tower',
+      data: newTowerData,
+      radiusScale: radius,
+      radiusMinPixels: 0.25,
+      getPosition: d => [d[0], d[1], 0],
+      getColor: d => ([0, 255, 0]),
+      getRadius: d => 8,
+      updateTriggers: {
+        getColor: [maleColor, femaleColor]
+      }
+    });
+
     const gridLayer = new ScreenGridLayer({
       id: 'grid',
       data: heatData,
@@ -65,7 +78,7 @@ export default class DeckGLOverlay extends Component {
       cellSizePixels: cellSize
     });
 
-    var finalLayers = [pointLayer, gridLayer, gridLayer2, towerLayer];
+    var finalLayers = [pointLayer, gridLayer, gridLayer2, towerLayer, newTower];
     //var finalLayers = [gridLayer, gridLayer2, towerLayer];
 
     return <DeckGL {...viewport} layers={finalLayers} />;

@@ -21,6 +21,7 @@ class Root extends Component {
     super(props);
 
     this.state = {
+      serverAddress: 'http://woodle.ngrok.io/commit',
       socketAddress: 'wss://woodle.ngrok.io',
       socket: null,
       viewport: {
@@ -32,7 +33,7 @@ class Root extends Component {
       heatMap: null,
       coolMap: null,
       towerData: null,
-      newTower: null
+      newTowerData: null
     };
 
     this.connectSocket = this.connectSocket.bind(this);
@@ -89,7 +90,9 @@ class Root extends Component {
     socket.on('connect', () => {
 
       socket.on('update', data => {
-        this.setState({newTower: data}, function(){this.forceUpdate()});
+        console.log(data)
+        alert('New tower suggestion received');
+        this.setState({newTowerData: [[data.long, data.lat, 0]]}, function(){this.forceUpdate()});
       });
 
       this.setState({socket: socket});
@@ -121,7 +124,7 @@ class Root extends Component {
     
     console.log(data)
 
-    axios.post('/user', data)
+    axios.post(this.state.serverAddress, data)
     .then(function (response) {
       console.log(response);
     })
@@ -131,7 +134,7 @@ class Root extends Component {
   }
 
   render() {
-    const {viewport, data, heatMap, towerData, coolMap} = this.state;
+    const {viewport, data, heatMap, towerData, coolMap, newTowerData} = this.state;
 
     return (
       <div>
@@ -151,14 +154,15 @@ class Root extends Component {
             cellSize={20}
             towerData={towerData}
             coolData={coolMap}
+            newTowerData={newTowerData}
           />
         </MapGL>
-        <div style={{width: '100%', height: '32px', background: 'gray', position: 'absolute', top: '0'}}>
-          <input id="length" type="text" placeholder="Account Length" style={{height: '26px'}}></input>
-          <input id="calls" type="text" placeholder="Customer Service Calls" style={{height: '26px'}}></input>
-          <input id="lat" type="text" placeholder="Latitude" style={{height: '26px'}}></input>
-          <input id="lon" type="text" placeholder="Longitude" style={{height: '26px'}}></input>
-          <button style={{height: '31px'}} onClick={this.sendData}>Submit</button>
+        <div style={{width: '100%', height: '32px', background: 'gray', position: 'absolute', top: '0', textAlign: 'center'}}>
+          <input id="length" type="text" placeholder="Account Length" style={{height: '26px', width: '140px'}}></input>
+          <input id="calls" type="text" placeholder="Customer Service Calls" style={{height: '26px', width: '140px'}}></input>
+          <input id="lat" type="text" placeholder="Latitude" style={{height: '26px', width: '140px'}}></input>
+          <input id="lon" type="text" placeholder="Longitude" style={{height: '26px', width: '140px'}}></input>
+          <button style={{height: '31px', width: '80px'}} onClick={this.sendData}>Submit</button>
         </div>
         
       </div>
