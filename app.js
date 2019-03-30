@@ -5,6 +5,7 @@ import DeckGLOverlay from './deckgl-overlay.js';
 import {csv as requestCsv} from 'd3-request';
 
 import io from 'socket.io-client';
+import axios from 'axios';
 
 const MAPBOX_TOKEN = process.env.MapboxAccessToken;
 
@@ -35,6 +36,7 @@ class Root extends Component {
     };
 
     this.connectSocket = this.connectSocket.bind(this);
+    this.sendData = this.sendData.bind(this);
 
     requestCsv(DATA_URL, (error, response) => {
       if (!error) {
@@ -95,28 +97,71 @@ class Root extends Component {
     });
   }
 
+  sendData() {
+    var data = {
+      'account length': document.getElementById("length").value,
+      'number vmail messages': '1',
+      'total day minutes': '1',
+      'total day calls': '1',
+      'total day charge': '1',
+      'total eve minutes': '1',
+      'total eve calls': '1',
+      'total eve charge': '1',
+      'total night minutes': '1',
+      'total night calls': '1',
+      'total night charge': '1',
+      'total intl minutes': '1',
+      'total intl calls': '1',
+      'total intl charge': '1',
+      'customer service calls': document.getElementById("calls").value,
+      churn: 'false',
+      lat: document.getElementById("lat").value,
+      long: document.getElementById("lon").value
+    }
+    
+    console.log(data)
+
+    axios.post('/user', data)
+    .then(function (response) {
+      console.log(response);
+    })
+    .catch(function (error) {
+      console.log(error);
+    });
+  }
+
   render() {
     const {viewport, data, heatMap, towerData, coolMap} = this.state;
 
     return (
-      <MapGL
-        {...viewport}
-        mapStyle="mapbox://styles/mapbox/dark-v9"
-        onViewportChange={this._onViewportChange.bind(this)}
-        mapboxApiAccessToken={MAPBOX_TOKEN}
-      >
-        <DeckGLOverlay
-          viewport={viewport}
-          data={data}
-          maleColor={CHURN_COLOR}
-          femaleColor={NO_CHURN_COLOR}
-          radius={30}
-          heatData={heatMap}
-          cellSize={20}
-          towerData={towerData}
-          coolData={coolMap}
-        />
-      </MapGL>
+      <div>
+        <MapGL
+          {...viewport}
+          mapStyle="mapbox://styles/mapbox/dark-v9"
+          onViewportChange={this._onViewportChange.bind(this)}
+          mapboxApiAccessToken={MAPBOX_TOKEN}
+        >
+          <DeckGLOverlay
+            viewport={viewport}
+            data={data}
+            maleColor={CHURN_COLOR}
+            femaleColor={NO_CHURN_COLOR}
+            radius={30}
+            heatData={heatMap}
+            cellSize={20}
+            towerData={towerData}
+            coolData={coolMap}
+          />
+        </MapGL>
+        <div style={{width: '100%', height: '32px', background: 'gray', position: 'absolute', top: '0'}}>
+          <input id="length" type="text" placeholder="Account Length" style={{height: '26px'}}></input>
+          <input id="calls" type="text" placeholder="Customer Service Calls" style={{height: '26px'}}></input>
+          <input id="lat" type="text" placeholder="Latitude" style={{height: '26px'}}></input>
+          <input id="lon" type="text" placeholder="Longitude" style={{height: '26px'}}></input>
+          <button style={{height: '31px'}} onClick={this.sendData}>Submit</button>
+        </div>
+        
+      </div>
     );
   }
 }

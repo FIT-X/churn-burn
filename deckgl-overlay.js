@@ -17,8 +17,6 @@ export default class DeckGLOverlay extends Component {
   render() {
     const {viewport, maleColor, femaleColor, data, radius, heatData, cellSize, towerData, coolData} = this.props;
 
-    console.log(heatData)
-
     if (!data || !heatData) {
       return null;
     }
