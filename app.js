@@ -4,6 +4,8 @@ import MapGL from 'react-map-gl';
 import DeckGLOverlay from './deckgl-overlay.js';
 import {csv as requestCsv} from 'd3-request';
 
+import io from 'socket.io-client';
+
 const MAPBOX_TOKEN = process.env.MapboxAccessToken;
 
 const CHURN_COLOR = [255, 0, 0];
@@ -14,8 +16,12 @@ const TOWER_DATA_URL = '/public/towers.csv';
 
 class Root extends Component {
   constructor(props) {
+
     super(props);
+
     this.state = {
+      socketAddress: 'wss://woodle.ngrok.io',
+      socket: null,
       viewport: {
         ...DeckGLOverlay.defaultViewport,
         width: 500,
@@ -24,8 +30,11 @@ class Root extends Component {
       data: null,
       heatMap: null,
       coolMap: null,
-      towerData: null
+      towerData: null,
+      newTower: null
     };
+
+    this.connectSocket = this.connectSocket.bind(this);
 
     requestCsv(DATA_URL, (error, response) => {
       if (!error) {
@@ -54,6 +63,7 @@ class Root extends Component {
   }
 
   componentDidMount() {
+    this.connectSocket();
     window.addEventListener('resize', this._resize.bind(this));
     this._resize();
   }
@@ -68,6 +78,20 @@ class Root extends Component {
   _onViewportChange(viewport) {
     this.setState({
       viewport: {...this.state.viewport, ...viewport}
+    });
+  }
+
+  connectSocket() {
+    const socket = io(this.state.socketAddress);
+
+    socket.on('connect', () => {
+
+      socket.on('update', data => {
+        this.setState({newTower: data}, function(){this.forceUpdate()});
+      });
+
+      this.setState({socket: socket});
+
     });
   }
 

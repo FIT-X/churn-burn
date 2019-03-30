@@ -10,7 +10,8 @@
     "luma.gl": "^4.0.1",
     "react": "^16.2.0",
     "react-dom": "^16.2.0",
-    "react-map-gl": "^3.0.0"
+    "react-map-gl": "^3.0.0",
+    "socket.io-client": "^2.2.0"
   },
   "devDependencies": {
     "buble-loader": "^0.4.0",

@@ -30,7 +30,7 @@ export default class DeckGLOverlay extends Component {
       radiusMinPixels: 0.25,
       getPosition: d => [d[0], d[1], 0],
       getColor: d => (d[2] === 1 ? maleColor : femaleColor),
-      getRadius: d => 1,
+      getRadius: d => .6,
       updateTriggers: {
         getColor: [maleColor, femaleColor]
       }
@@ -67,6 +67,9 @@ export default class DeckGLOverlay extends Component {
       cellSizePixels: cellSize
     });
 
-    return <DeckGL {...viewport} layers={[gridLayer, pointLayer, towerLayer, gridLayer2]} />;
+    var finalLayers = [pointLayer, gridLayer, gridLayer2, towerLayer];
+    //var finalLayers = [gridLayer, gridLayer2, towerLayer];
+
+    return <DeckGL {...viewport} layers={finalLayers} />;
   }
 }
